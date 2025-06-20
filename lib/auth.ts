@@ -32,8 +32,9 @@ export const authOptions:NextAuthOptions={
              if(!user){
               throw new Error("User not found")
              }
-           const isPasswordCorrect= await bcrypt.compare(user.password,credentials.password)
-           if(!isPasswordCorrect){
+          
+           const isPasswordCorrect= await bcrypt.compare(credentials.password,user.password)
+           if(! isPasswordCorrect){
             throw new Error("Incorrect Password")
            }
            return {
