@@ -9,17 +9,18 @@ export default withAuth(
     callbacks: {
       authorized({ req, token }) {
         const { pathname } = req.nextUrl;
+        // Allow public access to auth routes, login, register, home, and /api/video GET
         if (
           pathname.startsWith("/api/auth") ||
           pathname === "/login" ||
-          pathname === "/register"
-        )
-          return true;
-
-        if (pathname === "/" || pathname.startsWith("/api/videos")) {
+          pathname === "/register" ||
+          pathname === "/" ||
+          (pathname === "/api/video" && req.method === "GET")
+        ) {
           return true;
         }
 
+        // Require authentication for all other routes
         return !!token;
       },
     },
@@ -28,13 +29,6 @@ export default withAuth(
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
     "/((?!_next/static|_next/image|favicon.ico|public/).*)",
   ],
 };

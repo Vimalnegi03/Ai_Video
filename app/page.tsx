@@ -80,7 +80,7 @@ export default function Home() {
                   </a>
                   <button
                     onClick={() => router.push("/api/auth/signout")}
-                    className="text-gray-600  transition duration-300 text-sm sm:text-base hover:bg-red-600"
+                    className="text-gray-600 hover:text-red-600 transition duration-300 text-sm sm:text-base"
                   >
                     Sign Out
                   </button>
@@ -167,8 +167,6 @@ export default function Home() {
             ))}
           </div>
         </main>
-
-        {/* Footer */}
       </div>
     </ImageKitProvider>
   );
