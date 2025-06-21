@@ -60,12 +60,11 @@ export default function Home() {
         <header className="bg-white shadow-md sticky top-0 z-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
             <div className="flex items-center gap-2">
-              <Image
+              <img
                 src="/logo.png" // Replace with your app logo
                 alt="App Logo"
                 width={40}
                 height={40}
-                priority
               />
               <h1 className="text-2xl font-bold text-gray-800">VideoHub</h1>
             </div>
