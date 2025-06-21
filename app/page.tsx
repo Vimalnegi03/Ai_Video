@@ -1,103 +1,175 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { ImageKitProvider, IKVideo } from "imagekitio-next";
 import Image from "next/image";
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+interface IVideo {
+  _id: string;
+  title: string;
+  description: string;
+  videoUrl: string;
+  thumbnailUrl: string;
+  userId: string;
+  controls?: boolean;
+  transformation?: {
+    height?: number;
+    width?: number;
+    quality?: number;
+  };
+}
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+export default function Home() {
+  const [videos, setVideos] = useState<IVideo[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const response = await fetch("/api/video", {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to fetch videos");
+        }
+
+        console.log("Fetched videos:", data); // Log for debugging
+        setVideos(data);
+        setLoading(false);
+      } catch (err) {
+        setError(`Error fetching videos: ${err instanceof Error ? err.message : "Unknown error"}`);
+        setLoading(false);
+      }
+    };
+
+    fetchVideos();
+  }, []);
+
+  return (
+    <ImageKitProvider urlEndpoint={process.env.NEXT_PUBLIC_URL_ENDPOINT}>
+      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-gray-100 font-[family-name:var(--font-geist-sans)]">
+        {/* Header */}
+        <header className="bg-white shadow-md sticky top-0 z-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <Image
+                src="/logo.png" // Replace with your app logo
+                alt="App Logo"
+                width={40}
+                height={40}
+                priority
+              />
+              <h1 className="text-2xl font-bold text-gray-800">VideoHub</h1>
+            </div>
+            <nav className="flex gap-4">
+              {status === "authenticated" ? (
+                <>
+                  <a
+                    href="/upload"
+                    className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300 text-sm sm:text-base"
+                  >
+                    Upload Video
+                  </a>
+                  <button
+                    onClick={() => router.push("/api/auth/signout")}
+                    className="text-gray-600  transition duration-300 text-sm sm:text-base hover:bg-red-600"
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <a
+                  href="/api/auth/signin"
+                  className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300 text-sm sm:text-base"
+                >
+                  Sign In
+                </a>
+              )}
+            </nav>
+          </div>
+        </header>
+
+        {/* Main Content */}
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
+              Welcome to VideoHub
+            </h2>
+            <p className="text-lg text-gray-600 mt-2">
+              Discover and share amazing videos with the world!
+            </p>
+            {status !== "authenticated" && (
+              <a
+                href="/api/auth/signin"
+                className="mt-4 inline-block bg-blue-500 text-white py-2 px-6 rounded-md hover:bg-blue-600 transition duration-300"
+              >
+                Get Started
+              </a>
+            )}
+          </div>
+
+          {loading && (
+            <p className="text-center text-gray-500 text-lg">Loading videos...</p>
+          )}
+          {error && <p className="text-center text-red-500 text-lg">{error}</p>}
+          {videos.length === 0 && !loading && !error && (
+            <p className="text-center text-gray-500 text-lg">
+              No videos yet. Be the first to upload!
+            </p>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {videos.map((video) => (
+              <div
+                key={video._id}
+                className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 group"
+              >
+                <div className="relative">
+                  <IKVideo
+                    path={video.videoUrl.replace(process.env.NEXT_PUBLIC_URL_ENDPOINT!, "")}
+                    controls={video.controls ?? true}
+                    poster={video.thumbnailUrl || "/fallback-thumbnail.jpg"}
+                    className="w-full h-48 object-cover"
+                    onError={(e) =>
+                      console.error("IKVideo error:", e, "Thumbnail URL:", video.thumbnailUrl)
+                    }
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-30">
+                    <svg
+                      className="w-12 h-12 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M5 3l14 9-14 9V3z" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold text-gray-800 truncate">
+                    {video.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 line-clamp-2">
+                    {video.description}
+                  </p>
+                  {session?.user?.id === video.userId && (
+                    <p className="text-xs text-blue-500 mt-2">Uploaded by you</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </main>
+
+        {/* Footer */}
+      </div>
+    </ImageKitProvider>
   );
 }

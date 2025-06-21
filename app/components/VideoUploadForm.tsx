@@ -66,7 +66,7 @@ function VideoUploadForm() {
         throw new Error(data.error || "Failed to save video metadata");
       }
 
-      router.push("/video");
+      router.push("/");
     } catch (err) {
       setError(`Error saving video: ${err instanceof Error ? err.message : "Unknown error"}`);
     } finally {
