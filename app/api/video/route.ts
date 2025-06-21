@@ -20,7 +20,7 @@ export async function GET(){
     }
 }
 
-export async function POST(request:NextRequest,response:NextResponse){
+export async function POST(request:NextRequest){
     try {
         //to get user is authenticated or not
       const session= getServerSession(authOptions)
