@@ -1,6 +1,5 @@
 "use client";
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"; // Removed useRef
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { ImageKitProvider, IKVideo } from "imagekitio-next";
@@ -41,7 +40,7 @@ export default function Home() {
           throw new Error(data.error || "Failed to fetch videos");
         }
 
-        console.log("Fetched videos:", data); // Log for debugging
+        console.log("Fetched videos:", data);
         setVideos(data);
         setLoading(false);
       } catch (err) {
@@ -60,12 +59,7 @@ export default function Home() {
         <header className="bg-white shadow-md sticky top-0 z-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
             <div className="flex items-center gap-2">
-              <img
-                src="/logo.png" // Replace with your app logo
-                alt="App Logo"
-                width={40}
-                height={40}
-              />
+              <img src="/logo.png" alt="App Logo" width={40} height={40} />
               <h1 className="text-2xl font-bold text-gray-800">VideoHub</h1>
             </div>
             <nav className="flex gap-4">
@@ -131,26 +125,13 @@ export default function Home() {
                 key={video._id}
                 className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 group"
               >
-                <div className="relative">
-                  <IKVideo
-                    path={video.videoUrl.replace(process.env.NEXT_PUBLIC_URL_ENDPOINT!, "")}
-                    controls={video.controls ?? true}
-                    poster={video.thumbnailUrl || "/fallback-thumbnail.jpg"}
-                    className="w-full h-48 object-cover"
-                    onError={(e) =>
-                      console.error("IKVideo error:", e, "Thumbnail URL:", video.thumbnailUrl)
-                    }
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-30">
-                    <svg
-                      className="w-12 h-12 text-white"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M5 3l14 9-14 9V3z" />
-                    </svg>
-                  </div>
-                </div>
+                <IKVideo
+                  path={video.videoUrl.replace(process.env.NEXT_PUBLIC_URL_ENDPOINT!, "")}
+                  controls={video.controls ?? true}
+                  poster={video.thumbnailUrl || "/fallback-thumbnail.jpg"}
+                  className="w-full h-48 object-cover"
+                  onError={(e) => console.error("IKVideo error:", e, "Thumbnail URL:", video.thumbnailUrl)}
+                />
                 <div className="p-4">
                   <h3 className="text-lg font-semibold text-gray-800 truncate">
                     {video.title}

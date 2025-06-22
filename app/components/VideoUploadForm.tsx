@@ -73,7 +73,6 @@ function VideoUploadForm() {
       setUploading(false);
     }
   };
-
   return (
     <ImageKitProvider urlEndpoint={process.env.NEXT_PUBLIC_URL_ENDPOINT}>
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
